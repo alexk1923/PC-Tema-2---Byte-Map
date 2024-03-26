@@ -1,0 +1,116 @@
+#!/usr/bin/python3
+# Copyright 2020 Darius Neatu (neatudarius@gmail.com)
+
+import inspect
+import pathlib
+import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(
+    inspect.getfile(inspect.currentframe())))
+root_dir = pathlib.Path(current_dir).parent.parent
+sys.path.insert(0, str(root_dir))
+
+from check_utils.grader import Grader
+
+
+def parse(out):
+    index = [-1, -1, -1, -1, len(out)]
+    for t in range(1, len(index) - 1):
+        try:
+            index[t] = out.index('task {}'.format(t))
+        except:
+            pass
+
+    out_task = [[]] * len(index)
+    for t in range(1, len(index) - 1):
+        try:
+            out_task[t] = out[index[t]:index[t+1]]
+        except:
+            pass
+
+    print(index)
+    print(out_task)
+    return out_task
+
+
+class StarDustGrader(Grader):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def grade_test(self):
+        input, output, ref = self.read()
+        output = [line.rstrip() for line in output]
+        ref = [line.rstrip() for line in ref]
+        output_tasks, ref_tasks = parse(output), parse(ref)
+
+        points = [-1, 0.3 * self.max_points, 0.4 *
+                  self.max_points, 0.3 * self.max_points, -1]
+
+        err = []
+        # task 1
+        try:
+            output, ref = output_tasks[1], ref_tasks[1]
+            if len(output) == 0 or output[0] != ref[0]:
+                err += ['task 1: missing "task 1" tag']
+            else:
+                out_ma, ref_ma = float(output[1]), float(ref[1])
+                if abs(out_ma - ref_ma) < 0.0000001:
+                    # correct answer
+                    self.add_points(points[1])
+                else:
+                    # wrong answer (no points, append error message)
+                    err += ['task 1: m_a - {} vs {}'.format(out_ma, ref_ma)]
+        except:
+            # wrong/unexpected answer (no points, append error message)
+            err += ['task 1: m_a is missing or is not a floating point number']
+
+        # task 2
+        try:
+            output, ref = output_tasks[2], ref_tasks[2]
+            if len(output) == 0 or output[0] != ref[0]:
+                err += ['task 2: missing "task 2" tag']
+            else:
+                if output == ref:
+                    # correct answer
+                    self.add_points(points[2])
+                elif len(output) != len(ref):
+                    err += ['task 2: #lines - {} vs {}'.format(
+                        len(output), len(ref))]
+                else:
+                    # wrong answer (no points, append error message)
+                    err += ['task 2: wrong map content or format']
+        except:
+            pass
+
+        # task 3
+        try:
+            output, ref = output_tasks[3], ref_tasks[3]
+            if len(output) == 0 or output[0] != ref[0]:
+                err += ['task 3: missing "task 3" tag']
+            else:
+                out_i, out_j, out_size = [int(x) for x in output[1].split()]
+                ref_i, ref_j, ref_size = [int(x) for x in ref[1].split()]
+
+                if (out_i, out_j) != (ref_i, ref_j):
+                    err += ['task 3: (i, j) - {} vs {}'.format((out_i, out_j), (ref_i, ref_j))]
+                elif out_size != ref_size:
+                    err += ['task 3: size - {} vs {}'.format(
+                        out_size, ref_size)]
+                else:
+                    # correct answer
+                    self.add_points(points[3])
+        except:
+            # wrong/unexpected answer (no points, append error message)
+            err += ['task 3: i, j or size are missing or are not integers']
+
+        # automatically exists with 0 and write grade if get here
+        # nothing to do here
+        err = ' ### '.join(err)
+        self.exit(code=(0 if self.grade > 0 else -1),
+                  err=(err if len(err) > 0 else None))
+
+
+if __name__ == '__main__':
+    assert len(sys.argv) == 5, sys.argv
+    StarDustGrader(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]).run()

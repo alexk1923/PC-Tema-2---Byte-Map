@@ -1,0 +1,52 @@
+#Kullman Alexandru, 313CA
+
+# Task 1
+
+1. Calculul sumei bytesilor de pe margine se va face cu ajutorul functiei sum
+care adauga la suma bytes-ii din 4 zone distincte:
+-prima linie - toti bytes-ii
+-ultima linie - toti bytes-ii
+-de pe restul liniilor - primul si ultimul byte de pe prima, respectiv ultima
+coloana.
+
+2. Numarul bytes-ilor este determinat matematic, adunand cate 4 bytes pentru
+fiecare element (int) de pe prima si ultima linie, respectiv cate 2 bytes
+pentru fiecare linie ramasa. (primul si ultimul de pe acea linie).
+
+#Task 2
+
+1. Dupa citirea datelor, se va identifica actiunea si se va apela functia
+corespunzatoare.
+
+2. Functia de modify va "naviga" cu ajutorul unui pointer la byte-ul
+corespunzator, va completa cu 0 zonele de memorie aflate in afara hartii,
+daca este nevoie, realocandu-se memorie pentru matrice, urmand ca in final sa
+adauge noua valoare la adresa corespunzatoare.
+
+3. Functia de delete va "zero-iza" valoarea de la adresa de memorie dorita,
+in urma accesarii acelei zone de memorie cu pointerul *p si modificarea valorii
+prin pointerul *new cu 0.
+
+4. Functia de swap_bytes va inversa bytes-ii din block-ul de date, conform 
+datelor introduse, folosindu-se de functia swap, o simpla functie de 
+interschimbare a 2 valori.
+
+#Task 3
+
+1. Ne vom folosi de matricea visited, cu valori corespondente fiecarui byte din
+matricea a. Semnificatia va fi v[i][j] = 1 daca byte-ul j de pe linia i a fost
+parcurs, 0 in rest.
+
+2. Pentru fiecare byte din harta modificata vom apela functia black_hole care
+va returna dimensiunea maxima a unei gauri negre pornind din acest byte.
+
+3. Functia black_hole returneaza 0 in cazul in care byte-ul de la pozitia [i,j]
+pentru care a fost apelata nu reprezinta gaura neagra: byte-ul nu are 
+valoarea 0, l-am vizitat deja sau depaseste conturu hartii. Se va mari
+dimensiunea cu 1 si se  va apela aceeasi functie pentru toti vecinii byte-ului
+respectiv (daca este posibil), in cazul in care acest byte respecta criteriile
+necesare.
+
+4. Dupa fiecare apel din main al functiei black_hole, vom retine in max
+dimensiunea acelei gauri negre supermasive daca este mai mare decat maximul
+curent si retinem, de asemenea, si indicii curenti.
